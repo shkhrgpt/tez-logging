@@ -1,6 +1,7 @@
 package com.sgupta.tez.history.logging;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.tez.dag.app.AppContext;
 import org.apache.tez.dag.history.DAGHistoryEvent;
 import org.apache.tez.dag.history.logging.ats.ATSHistoryLoggingService;
 import org.apache.tez.dag.history.logging.proto.ProtoHistoryLoggingService;
@@ -38,6 +39,12 @@ public class ProtoATSLoggingService extends ProtoHistoryLoggingService {
   protected void serviceStop() throws Exception {
     super.serviceStop();
     atsHistoryLoggingService.serviceStop();
+  }
+
+  @Override
+  public void setAppContext(AppContext appContext) {
+    super.setAppContext(appContext);
+    atsHistoryLoggingService.setAppContext(appContext);
   }
 
   @Override
