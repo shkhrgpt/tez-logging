@@ -1,8 +1,14 @@
 package com.sgupta.tez.history.logging;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.service.LifecycleEvent;
+import org.apache.hadoop.service.ServiceStateChangeListener;
 import org.apache.tez.dag.app.AppContext;
 import org.apache.tez.dag.history.DAGHistoryEvent;
+import org.apache.tez.dag.history.logging.HistoryLoggingService;
 import org.apache.tez.dag.history.logging.ats.ATSHistoryLoggingService;
 import org.apache.tez.dag.history.logging.proto.ProtoHistoryLoggingService;
 
@@ -14,42 +20,97 @@ import org.apache.tez.dag.history.logging.proto.ProtoHistoryLoggingService;
  *   <value>com.sgupta.tez.history.logging.ProtoATSLoggingService</value>
  *  </property>
  */
-public class ProtoATSLoggingService extends ProtoHistoryLoggingService {
+public class ProtoATSLoggingService extends HistoryLoggingService {
 
   private final ATSHistoryLoggingService atsHistoryLoggingService;
+  private final ProtoHistoryLoggingService protoHistoryLoggingService;
 
   public ProtoATSLoggingService() {
-    super();
+    super(ProtoATSLoggingService.class.getName());
     atsHistoryLoggingService = new ATSHistoryLoggingService();
-  }
-
-  @Override
-  protected void serviceInit(Configuration conf) throws Exception {
-    super.serviceInit(conf);
-    atsHistoryLoggingService.serviceInit(conf);
-  }
-
-  @Override
-  protected void serviceStart() throws Exception {
-    super.serviceStart();
-    atsHistoryLoggingService.serviceStart();
-  }
-
-  @Override
-  protected void serviceStop() throws Exception {
-    super.serviceStop();
-    atsHistoryLoggingService.serviceStop();
+    protoHistoryLoggingService = new ProtoHistoryLoggingService();
   }
 
   @Override
   public void setAppContext(AppContext appContext) {
-    super.setAppContext(appContext);
     atsHistoryLoggingService.setAppContext(appContext);
+    protoHistoryLoggingService.setAppContext(appContext);
   }
 
   @Override
   public void handle(DAGHistoryEvent event) {
-    super.handle(event);
     atsHistoryLoggingService.handle(event);
+    protoHistoryLoggingService.handle(event);
+  }
+
+  @Override
+  public synchronized STATE getFailureState() {
+    return protoHistoryLoggingService.getFailureState();
+  }
+
+  @Override
+  public void init(Configuration conf) {
+    atsHistoryLoggingService.init(conf);
+    protoHistoryLoggingService.init(conf);
+  }
+
+  @Override
+  public void start() {
+    atsHistoryLoggingService.start();
+    protoHistoryLoggingService.start();
+  }
+
+  @Override
+  public void stop() {
+    atsHistoryLoggingService.stop();
+    protoHistoryLoggingService.stop();
+  }
+
+  @Override
+  public void registerServiceListener(ServiceStateChangeListener l) {
+    atsHistoryLoggingService.registerServiceListener(l);
+    protoHistoryLoggingService.registerServiceListener(l);
+  }
+
+  @Override
+  public void unregisterServiceListener(ServiceStateChangeListener l) {
+    atsHistoryLoggingService.unregisterServiceListener(l);
+    protoHistoryLoggingService.unregisterServiceListener(l);
+  }
+
+  @Override
+  public String getName() {
+    return protoHistoryLoggingService.getName();
+  }
+
+  @Override
+  public synchronized Configuration getConfig() {
+    return protoHistoryLoggingService.getConfig();
+  }
+
+  @Override
+  public long getStartTime() {
+    return protoHistoryLoggingService.getStartTime();
+  }
+
+  @Override
+  public synchronized List<LifecycleEvent> getLifecycleHistory() {
+    return protoHistoryLoggingService.getLifecycleHistory();
+  }
+
+  @Override
+  public String toString() {
+    return protoHistoryLoggingService.toString();
+  }
+
+  @Override
+  public void removeBlocker(String name) {
+    atsHistoryLoggingService.removeBlocker(name);
+    protoHistoryLoggingService.removeBlocker(name);
+  }
+
+  @Override
+  public Map<String, String> getBlockers() {
+    return protoHistoryLoggingService.getBlockers();
   }
 }
